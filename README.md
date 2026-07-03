@@ -49,6 +49,6 @@ The **Electronic Design Package** is poised to revolutionize the circuit design 
 ## Get Started
 
 To learn more about our package, contribute to the project, or provide feedback, please visit our 
-[GitHub repository](#vrosuits/eCircuit) 
+[GitHub repository](https://github.com/vrosuits/eCircuit) 
 or reach out via 
-[vrosuits@gmail.com](#). Let's innovate together!
+[vrosuits@gmail.com](mailto:vrosuits@gmail.com). Let's innovate together!

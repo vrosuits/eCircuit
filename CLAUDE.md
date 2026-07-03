@@ -17,5 +17,5 @@ Planned modules: Text2Circuit (text → schematic/BOM/netlist), Text2PCB (AI-ass
 ## Current status — read before scaffolding
 
 - **Language: Python.** Still undecided: package manager/build tooling, GUI framework, and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm these with the user before scaffolding code; then record the decisions in this file.
-- The GitHub link in the README (`vrosuits/eCircuit`) is a placeholder — no remote is configured yet.
+- Remote: https://github.com/vrosuits/eCircuit (public), pushed over HTTPS via the `gh` credential helper — this machine has no GitHub SSH key.
 - There is no build, test, lint, or format tooling yet. Update this file with the exact commands once they exist.
