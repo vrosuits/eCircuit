@@ -1,6 +1,19 @@
 # CLAUDE.md
 
+(c) Copyright 2026 by Antony J Ingram of UNIVERSAL I.T SYSTEMS. All rights reserved.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Copyright headers
+
+Every new source file must start with:
+
+```
+# (c) Copyright 2026 by Antony J Ingram of UNIVERSAL I.T SYSTEMS. All rights reserved.
+# Licensed under the eCircuit Licence — see LICENCE.md.
+```
+
+The project is proprietary (free personal use, paid commercial tiers) — see `LICENCE.md`. Do not add open-source licence boilerplate.
 
 ## Project
 
@@ -14,8 +27,17 @@ Planned modules: Text2Circuit (text → schematic/BOM/netlist), Text2PCB (AI-ass
 - **Memory budget:** local ("narrow AI") tools must run within **2 GB RAM**.
 - **Standards:** schematic and silkscreen rendering must be IEEE-compliant.
 
-## Current status — read before scaffolding
+## Stack and commands
 
-- **Language: Python.** Still undecided: package manager/build tooling, GUI framework, and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm these with the user before scaffolding code; then record the decisions in this file.
-- Remote: https://github.com/vrosuits/eCircuit (public), pushed over HTTPS via the `gh` credential helper — this machine has no GitHub SSH key.
-- There is no build, test, lint, or format tooling yet. Update this file with the exact commands once they exist.
+Python 3.12, managed with **uv** (src layout, package `ecircuit`, subpackages `text2circuit` / `text2pcb` / `rendering` / `simulation`).
+
+- Test: `uv run pytest`
+- Lint: `uv run ruff check .`
+- Format: `uv run ruff format .`
+- Run CLI: `uv run ecircuit`
+
+Still undecided: GUI framework and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm with the user before committing to one.
+
+## Git
+
+Remote: `git@github.com:vrosuits/eCircuit.git` (public). The SSH key is passphrase-protected and served by an agent at `~/.ssh/agent.sock` (see `IdentityAgent` in `~/.ssh/config`). If pushes fail with `publickey` after a reboot, restart the agent and have the user re-enter the passphrase in a GUI terminal window.

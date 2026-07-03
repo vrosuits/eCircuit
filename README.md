@@ -46,9 +46,21 @@ Welcome to the **Electronic Design Package**, a cutting-edge solution designed t
 
 The **Electronic Design Package** is poised to revolutionize the circuit design landscape, harnessing the power of AI and modern graphical techniques to enhance efficiency, accuracy, and accessibility. Join us on this exciting journey towards the future of electronic design! 
 
+## Licensing
+
+eCircuit is **free for personal, non-commercial use** and free for enrolled students.
+Commercial use requires a subscription, with tiers for small businesses, larger
+companies, and enterprise/government/military organizations. Premium modules are
+available for purchase by active subscribers. See [LICENCE.md](LICENCE.md) for the
+full terms and pricing.
+
 ## Get Started
 
 To learn more about our package, contribute to the project, or provide feedback, please visit our 
 [GitHub repository](https://github.com/vrosuits/eCircuit) 
 or reach out via 
 [vrosuits@gmail.com](mailto:vrosuits@gmail.com). Let's innovate together!
+
+---
+
+(c) Copyright 2026 by Antony J Ingram of UNIVERSAL I.T SYSTEMS. All rights reserved.
