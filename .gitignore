@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment / secrets (DeepSeek API key etc.)
+.env
+
+# Editors
+.idea/
+.vscode/
+
+# Personal Claude Code preferences
+CLAUDE.local.md
