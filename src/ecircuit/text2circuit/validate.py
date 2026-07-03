@@ -5,15 +5,17 @@
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 from typing import Literal
 
 from pydantic import BaseModel
 
 from .models import GROUND_NODE, Circuit, Component
-from .pinouts import canonical_pin_name, lookup_pinout
+from .pinouts import acceptable_names, canonical_pin_name, lookup_pinout
 
 _POWER_PIN_NAMES = {"VCC", "GND"}
+_OUTPUT_PIN = re.compile(r"OUT[1-4]?")
 
 
 class Issue(BaseModel):
@@ -97,14 +99,14 @@ def _check_known_pinout(component: Component, issues: list[Issue]) -> None:
                     ),
                 )
             )
-        elif canonical_pin_name(pin.name) != pinout[pin.pin - 1]:
+        elif canonical_pin_name(pin.name) not in acceptable_names(pinout[pin.pin - 1]):
+            expected = " or ".join(acceptable_names(pinout[pin.pin - 1]))
             issues.append(
                 Issue(
                     severity="error",
                     message=(
                         f"{component.ref} ({component.value}): pin {pin.pin} is named "
-                        f"{pin.name} but the datasheet says pin {pin.pin} is "
-                        f"{pinout[pin.pin - 1]}"
+                        f"{pin.name} but the datasheet says pin {pin.pin} is {expected}"
                     ),
                 )
             )
@@ -116,17 +118,18 @@ def _check_output_shorts(component: Component, issues: list[Issue]) -> None:
     by_name: dict[str, str] = {}
     for pin in component.pins:
         by_name.setdefault(canonical_pin_name(pin.name), pin.net)
-    out_net = by_name.get("OUT")
-    if out_net is None:
-        return
-    for rail in _POWER_PIN_NAMES:
-        if by_name.get(rail) == out_net:
-            issues.append(
-                Issue(
-                    severity="error",
-                    message=(
-                        f"{component.ref}: OUT pin is shorted to the {rail} rail "
-                        f"(net {out_net})"
-                    ),
+    outputs = {
+        name: net for name, net in by_name.items() if _OUTPUT_PIN.fullmatch(name)
+    }
+    for out_name, out_net in outputs.items():
+        for rail in _POWER_PIN_NAMES:
+            if by_name.get(rail) == out_net:
+                issues.append(
+                    Issue(
+                        severity="error",
+                        message=(
+                            f"{component.ref}: {out_name} pin is shorted to the "
+                            f"{rail} rail (net {out_net})"
+                        ),
+                    )
                 )
-            )

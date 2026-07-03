@@ -42,9 +42,14 @@ Rules:
 - Discrete transistors use "nodes" in SPICE order: [collector, base,
   emitter] for BJTs, [drain, gate, source] for FETs.
 - Every IC uses "pins", listing every connected pin with its REAL datasheet
-  pin number and function name. Example — NE555: 1 GND, 2 TRIG, 3 OUT,
-  4 RESET, 5 CTRL, 6 THRES, 7 DISCH, 8 VCC. Double-check each pin number
-  against the function before answering; unconnected pins may be omitted.
+  pin number and function name. Examples —
+  NE555: 1 GND, 2 TRIG, 3 OUT, 4 RESET, 5 CTRL, 6 THRES, 7 DISCH, 8 VCC.
+  LM358 (dual op-amp): 1 OUT1, 2 IN1-, 3 IN1+, 4 GND, 5 IN2+, 6 IN2-,
+  7 OUT2, 8 VCC. LM324 (quad op-amp): V+ on pin 4, V- on pin 11.
+  7805 regulator: 1 IN, 2 GND, 3 OUT. 7905: 1 GND, 2 IN, 3 OUT.
+  LM317: 1 ADJ, 2 OUT, 3 IN.
+  Double-check each pin number against the function before answering;
+  unconnected pins may be omitted.
 - Use SPICE-compatible values: 10k, 4.7k, 100n, 10u, 1meg (not 1M for mega).
 - The circuit must be complete and electrically sound: every net must
   connect at least two pins, every component must have a current path, and
