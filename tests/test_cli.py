@@ -6,7 +6,8 @@ from pathlib import Path
 import pytest
 
 from ecircuit import cli
-from ecircuit.text2circuit import Circuit, Component
+from ecircuit.text2circuit import Circuit, Component, GenerationResult
+from ecircuit.text2circuit.validate import Issue
 
 
 @pytest.fixture
@@ -18,7 +19,12 @@ def fake_circuit(monkeypatch: pytest.MonkeyPatch) -> Circuit:
             Component(ref="D1", type="led", value="red", nodes=["N1", "0"]),
         ],
     )
-    monkeypatch.setattr(cli, "generate_circuit", lambda description: circuit)
+    result = GenerationResult(
+        circuit=circuit,
+        warnings=[Issue(severity="warning", message="something to double-check")],
+        repair_rounds=1,
+    )
+    monkeypatch.setattr(cli, "generate", lambda description: result)
     return circuit
 
 
@@ -26,9 +32,11 @@ def test_cli_prints_netlist_and_bom(
     fake_circuit: Circuit, capsys: pytest.CaptureFixture[str]
 ) -> None:
     assert cli.main(["text2circuit", "an led blinker"]) == 0
-    out = capsys.readouterr().out
-    assert "R1 VCC N1 330" in out
-    assert "| 1 | led | red |" in out
+    captured = capsys.readouterr()
+    assert "R1 VCC N1 330" in captured.out
+    assert "| 1 | led | red |" in captured.out
+    assert "repaired in 1 round(s)" in captured.err
+    assert "warning: something to double-check" in captured.err
 
 
 def test_cli_writes_files(fake_circuit: Circuit, tmp_path: Path) -> None:

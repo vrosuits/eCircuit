@@ -13,7 +13,7 @@ from .text2circuit import (
     CircuitParseError,
     DeepSeekError,
     build_bom,
-    generate_circuit,
+    generate,
     to_csv,
     to_markdown,
     to_spice,
@@ -45,7 +45,16 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _run_text2circuit(args: argparse.Namespace) -> int:
-    circuit = generate_circuit(args.description)
+    result = generate(args.description)
+    circuit = result.circuit
+    if result.repair_rounds:
+        print(
+            f"note: design was repaired in {result.repair_rounds} round(s) "
+            "after validation errors",
+            file=sys.stderr,
+        )
+    for issue in result.warnings:
+        print(f"warning: {issue.message}", file=sys.stderr)
     netlist = to_spice(circuit)
     bom_lines = build_bom(circuit)
 

@@ -8,6 +8,7 @@ from ecircuit.text2circuit import (
     Circuit,
     CircuitParseError,
     Component,
+    Pin,
     build_bom,
     parse_circuit_response,
     to_csv,
@@ -89,3 +90,47 @@ def test_parse_tolerates_markdown_fences() -> None:
 def test_parse_rejects_garbage() -> None:
     with pytest.raises(CircuitParseError):
         parse_circuit_response("sorry, I cannot design that circuit")
+
+
+def test_pins_derive_nodes_in_pin_order() -> None:
+    component = Component(
+        ref="U1",
+        type="ic",
+        value="NE555",
+        pins=[
+            Pin(pin=8, name="VCC", net="VCC"),
+            Pin(pin=1, name="gnd", net="GND"),
+            Pin(pin=3, name="out", net="VOUT"),
+        ],
+    )
+    assert component.nodes == ["0", "VOUT", "VCC"]
+    assert [pin.pin for pin in component.pins or []] == [1, 3, 8]
+    assert component.pins is not None
+    assert component.pins[0].name == "GND"
+    assert component.pins[0].net == "0"
+
+
+def test_component_without_connections_rejected() -> None:
+    with pytest.raises(ValidationError, match="no connections"):
+        Component(ref="U1", type="ic", value="NE555")
+
+
+def test_netlist_comments_pin_map() -> None:
+    circuit = Circuit(
+        name="pin_map",
+        components=[
+            Component(
+                ref="U1",
+                type="ic",
+                value="NE555",
+                pins=[
+                    Pin(pin=1, name="GND", net="0"),
+                    Pin(pin=8, name="VCC", net="VCC"),
+                ],
+            ),
+            Component(ref="R1", type="resistor", value="1k", nodes=["VCC", "0"]),
+        ],
+    )
+    netlist = to_spice(circuit)
+    assert "* U1 NE555 pins: 1:GND=0 8:VCC=VCC\n" in netlist
+    assert "U1 0 VCC NE555" in netlist

@@ -5,21 +5,35 @@
 
 from .bom import BomLine, build_bom, to_csv, to_markdown
 from .client import DeepSeekClient, DeepSeekError
-from .models import Circuit, Component
+from .models import Circuit, Component, Pin
 from .netlist import to_spice
-from .pipeline import CircuitParseError, generate_circuit, parse_circuit_response
+from .pipeline import (
+    CircuitParseError,
+    CircuitValidationError,
+    GenerationResult,
+    generate,
+    generate_circuit,
+    parse_circuit_response,
+)
+from .validate import Issue, validate_circuit
 
 __all__ = [
     "BomLine",
     "Circuit",
     "CircuitParseError",
+    "CircuitValidationError",
     "Component",
     "DeepSeekClient",
     "DeepSeekError",
+    "GenerationResult",
+    "Issue",
+    "Pin",
     "build_bom",
+    "generate",
     "generate_circuit",
     "parse_circuit_response",
     "to_csv",
     "to_markdown",
     "to_spice",
+    "validate_circuit",
 ]
