@@ -39,6 +39,10 @@ Python 3.12, managed with **uv** (src layout, package `ecircuit`, subpackages `t
 
 Still undecided: GUI framework and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm with the user before committing to one.
 
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) runs pytest, `ruff check`, and `ruff format --check` on every push/PR to main. Run all three locally before pushing. It installs with `uv sync --locked`, so commit `uv.lock` changes whenever dependencies change.
+
 ## Git
 
 Remote: `git@github.com:vrosuits/eCircuit.git` (public). The SSH key is passphrase-protected and served by an agent at `~/.ssh/agent.sock` (see `IdentityAgent` in `~/.ssh/config`). If pushes fail with `publickey` after a reboot, restart the agent and have the user re-enter the passphrase in a GUI terminal window.
