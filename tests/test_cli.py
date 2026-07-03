@@ -45,6 +45,23 @@ def test_cli_writes_files(fake_circuit: Circuit, tmp_path: Path) -> None:
     assert (tmp_path / "blinker_bom.csv").exists()
     assert (tmp_path / "blinker_bom.md").exists()
     assert (tmp_path / "blinker.json").exists()
+    assert "=== blinker ===" in (tmp_path / "blinker.txt").read_text()
+
+
+def test_cli_render_subcommand(
+    fake_circuit: Circuit, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    json_path = tmp_path / "c.json"
+    json_path.write_text(fake_circuit.model_dump_json())
+    assert cli.main(["render", str(json_path), "--ascii"]) == 0
+    out = capsys.readouterr().out
+    assert "=== blinker ===" in out
+    assert all(ord(char) < 128 for char in out)
+
+
+def test_cli_render_missing_file(capsys: pytest.CaptureFixture[str]) -> None:
+    assert cli.main(["render", "/nonexistent/c.json"]) == 2
+    assert "error:" in capsys.readouterr().err
 
 
 def test_cli_reports_missing_api_key(

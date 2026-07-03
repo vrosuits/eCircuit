@@ -34,7 +34,7 @@ Python 3.12, managed with **uv** (src layout, package `ecircuit`, subpackages `t
 - Test: `uv run pytest`
 - Lint: `uv run ruff check .`
 - Format: `uv run ruff format .`
-- Run CLI: `uv run ecircuit` (e.g. `uv run ecircuit text2circuit "an RC low-pass filter" -o out/`)
+- Run CLI: `uv run ecircuit` (e.g. `uv run ecircuit text2circuit "an RC low-pass filter" -o out/`; `uv run ecircuit render out/<name>.json [--ascii]` draws a text schematic)
 - `DEEPSEEK_API_KEY` must be set for AI features (Text2Circuit); put it in `.env` (gitignored), never in code. Tests mock the API and need no key.
 
 Still undecided: GUI framework and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm with the user before committing to one.
