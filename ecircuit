@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# (c) Copyright 2026 by Antony J Ingram of UNIVERSAL I.T SYSTEMS. All rights reserved.
+# Licensed under the eCircuit Licence — see LICENCE.md.
+#
+# eCircuit launcher: sets up everything needed and runs the CLI.
+#   ./ecircuit text2circuit "a 555 LED blinker" -o out/
+#   ./ecircuit render out/<name>.json
+#   ./ecircuit simulate out/<name>.json --tran 1m 5 --uic
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+# Make sure uv is available, installing it locally if needed.
+if ! command -v uv >/dev/null 2>&1; then
+    if [ -x "$HOME/.local/bin/uv" ]; then
+        export PATH="$HOME/.local/bin:$PATH"
+    else
+        echo "eCircuit: uv not found — installing to ~/.local/bin ..." >&2
+        curl -LsSf https://astral.sh/uv/install.sh | sh >&2
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+fi
+
+# Load project secrets (DEEPSEEK_API_KEY) if present.
+if [ -f .env ]; then
+    set -a
+    # shellcheck disable=SC1091
+    . ./.env
+    set +a
+fi
+
+# Friendly preflight for the simulate command.
+if [ "${1:-}" = "simulate" ] && ! command -v ngspice >/dev/null 2>&1; then
+    echo "eCircuit: warning — ngspice is not installed (sudo apt install ngspice)" >&2
+fi
+
+# uv run syncs dependencies automatically on first use.
+exec uv run ecircuit "$@"

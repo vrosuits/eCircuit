@@ -56,6 +56,18 @@ full terms and pricing.
 
 ## Get Started
 
+Clone the repository and use the launcher in the project root — it installs
+what it needs (the `uv` package manager and Python dependencies) on first run:
+
+```bash
+./ecircuit text2circuit "a 555 timer LED blinker at 1 Hz on a 9V battery" -o out/
+./ecircuit render out/555_astable_led_blinker.json      # text schematic
+./ecircuit simulate out/555_astable_led_blinker.json --tran 1m 5 --uic
+```
+
+AI generation needs a DeepSeek API key in a `.env` file (`DEEPSEEK_API_KEY=...`);
+simulation needs ngspice (`sudo apt install ngspice`).
+
 To learn more about our package, contribute to the project, or provide feedback, please visit our 
 [GitHub repository](https://github.com/vrosuits/eCircuit) 
 or reach out via 

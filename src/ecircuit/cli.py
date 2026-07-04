@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from .rendering import render_circuit
+from .simulation import SimulationError, simulate_op, simulate_tran
 from .text2circuit import (
     Circuit,
     CircuitParseError,
@@ -61,6 +62,33 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="draw with plain ASCII instead of Unicode",
     )
+
+    sim = subparsers.add_parser(
+        "simulate",
+        help="run a SPICE simulation (via ngspice) on a saved circuit .json",
+    )
+    sim.add_argument(
+        "circuit_json", type=Path, help="circuit .json produced by text2circuit"
+    )
+    sim.add_argument(
+        "--tran",
+        nargs=2,
+        metavar=("STEP", "STOP"),
+        help="transient analysis, e.g. --tran 1m 5 (default: DC operating point)",
+    )
+    sim.add_argument(
+        "--uic",
+        action="store_true",
+        help="start the transient from zero initial conditions (capacitors discharged)",
+    )
+    sim.add_argument(
+        "-o",
+        "--out",
+        type=Path,
+        default=None,
+        metavar="CSV",
+        help="write transient traces to a CSV file",
+    )
     return parser
 
 
@@ -106,6 +134,38 @@ def _run_render(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_simulate(args: argparse.Namespace) -> int:
+    circuit = Circuit.model_validate_json(args.circuit_json.read_text())
+
+    if args.tran is None:
+        voltages, warnings = simulate_op(circuit)
+        for warning in warnings:
+            print(f"warning: {warning}", file=sys.stderr)
+        print(f"DC operating point for {circuit.name}:")
+        for net, voltage in sorted(voltages.items()):
+            print(f"  {net:>12}  {voltage:.6g} V")
+        return 0
+
+    step, stop = args.tran
+    result = simulate_tran(circuit, step, stop, uic=args.uic)
+    for warning in result.warnings:
+        print(f"warning: {warning}", file=sys.stderr)
+    print(f"transient ({step} step, {stop} stop) for {circuit.name}:")
+    print(f"  {'net':>12}  {'min':>12}  {'max':>12}  {'final':>12}")
+    for net, values in sorted(result.traces.items()):
+        print(
+            f"  {net:>12}  {min(values):>12.6g}  {max(values):>12.6g}  {values[-1]:>12.6g}"
+        )
+    if args.out is not None:
+        header = ["time", *sorted(result.traces)]
+        rows = zip(result.time, *(result.traces[net] for net in sorted(result.traces)))
+        lines = [",".join(header)]
+        lines.extend(",".join(f"{value:.9g}" for value in row) for row in rows)
+        args.out.write_text("\n".join(lines) + "\n")
+        print(f"wrote traces to {args.out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     try:
@@ -113,10 +173,12 @@ def main(argv: list[str] | None = None) -> int:
             return _run_text2circuit(args)
         if args.command == "render":
             return _run_render(args)
+        if args.command == "simulate":
+            return _run_simulate(args)
     except OSError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
-    except (DeepSeekError, CircuitParseError, ValueError) as exc:
+    except (DeepSeekError, CircuitParseError, SimulationError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     return 1

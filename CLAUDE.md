@@ -35,7 +35,9 @@ Python 3.12, managed with **uv** (src layout, package `ecircuit`, subpackages `t
 - Lint: `uv run ruff check .`
 - Format: `uv run ruff format .`
 - Run CLI: `uv run ecircuit` (e.g. `uv run ecircuit text2circuit "an RC low-pass filter" -o out/`; `uv run ecircuit render out/<name>.json [--ascii]` draws a text schematic)
+- `./ecircuit` (bash launcher at repo root) is the user-facing entry point: ensures uv, loads `.env`, then delegates to `uv run ecircuit`. Keep it in sync when adding subcommands.
 - `DEEPSEEK_API_KEY` must be set for AI features (Text2Circuit); put it in `.env` (gitignored), never in code. Tests mock the API and need no key.
+- Simulation (`uv run ecircuit simulate out/<name>.json [--tran STEP STOP]`) requires **ngspice** (`sudo apt install ngspice`); tests that need it auto-skip when it's missing (CI installs it).
 
 Still undecided: GUI framework and SPICE engine (e.g., ngspice via PySpice vs. alternatives). Confirm with the user before committing to one.
 
